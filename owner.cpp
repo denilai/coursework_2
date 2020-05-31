@@ -2,14 +2,22 @@
 #include <iostream>
 #include <string>
 
-Owner::Owner(const int dim):dim(dim){
+Owner::Owner(const int dim) :dim(dim), current_unit({-1,-1}) {
 	field.assign(dim, std::vector<char>(dim));
 }
 
-void Owner::create_field() {
+void Owner::find_first_unit() {
+	for (int i=0, j = 0; i< dim; i++)
+		if (field[i][j] == '1') {
+			current_unit = { i,j };
+			return;
+		}
+}
+
+void Owner::create_field(std::istream*stream) {
 	std::string line;
 	for (int i = 0; i < dim; i++) {
-		std::cin >> line;
+		*stream >> line;
 		for (int j = 0; j < dim; j++)
 			field[i][j] = line[j];
 	}

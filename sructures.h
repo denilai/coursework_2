@@ -1,6 +1,7 @@
 #ifndef STRUCTURES
 #define STRUCTURES
 #include <queue>
+#include <string>
 
 typedef struct {// структура, предстваляющая
 				// элемент массива как двумерную структуру (координаты)
