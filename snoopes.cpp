@@ -36,6 +36,11 @@ std::string RightSnoopy::IsUnitHere(neighbors* symb) {
 
 std::string RightSnoopy::get_name()const { return "RightSnoopy"; }
 
+void RightSnoopy::emit_signal(neighbors* symb) {
+	//std::string answer = IsUnitHere(symb);
+	(header->*(*slot))(IsUnitHere(symb));
+}
+
 //------------------------------------class TopSnoopy---------------------------------//
 
 std::string TopSnoopy::IsUnitHere(neighbors* symb) {
@@ -44,6 +49,11 @@ std::string TopSnoopy::IsUnitHere(neighbors* symb) {
 
 std::string TopSnoopy::get_name()const { return "TopSnoopy"; }
 
+void TopSnoopy::emit_signal(neighbors* symb) {
+	//std::string answer = IsUnitHere(symb);
+	(header->*(*slot))(IsUnitHere(symb));
+}
+
 //------------------------------------class BotSnoopy---------------------------------//
 
 std::string BotSnoopy::IsUnitHere(neighbors* symb) {
@@ -51,5 +61,10 @@ std::string BotSnoopy::IsUnitHere(neighbors* symb) {
 }
 
 std::string BotSnoopy::get_name()const { return "BotSnoopy"; }
+
+void BotSnoopy::emit_signal(neighbors* symb) {
+	//std::string answer = IsUnitHere(symb);
+	(header->*(*slot))(IsUnitHere(symb));
+}
 
 //-------------------------------------------------------------------------------------//

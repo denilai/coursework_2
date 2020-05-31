@@ -34,58 +34,56 @@ void Owner::show_matrix() const {
 	}
 }
 
-bool Owner::get_el(position elem)const {
-	return field[elem.row][elem.col] == '1' ? true : false;
-}
-
 //----------------------- сигналы-обработчики--------------------------------------------
-void Owner::set_connection(looper signal, Snoopy* handler, snoopers slots, const int sig_num) {
-	for (auto it = connections.begin(); it != connections.end(); it++)
-		if (it->second->sig_num == sig_num)
-			return;
+void Owner::set_connection(looper signal, pack handlers, snoopers slots, const int sig_num) {
+	if (connections.second && connections.second->sig_num == sig_num)
+		return;
 	to_snp_info_t* din_struct = new to_snp_info_t;
-	din_struct->handler = handler;
+	din_struct->handlers = handlers;
 	din_struct->slots = &slots;
 	din_struct->sig_num = sig_num;
-	connections.push_back(std::make_pair(signal, din_struct));
+	connections=(std::make_pair(signal, din_struct));
 	return;
 }
 
 void Owner::delete_connection(const int sig_num) {
-	for (auto it = connections.begin(); it != connections.end(); it++)
-		if (it->second->sig_num == sig_num) {
-			connections.erase(it);
-			return;
-		}
-}
+	connections.first = nullptr;
+	connections = { nullptr ,nullptr };
+};
 
-void Owner::emit_signal(looper signal, stepper step) {
-	std::string top, right, bot, left;
+bool Owner::emit_signal(looper signal) {
+	bool flag = false;
+	std::vector<std::string> answers;
 	neighbors* neighbors = (this->*signal)();
-	for (auto const& connection : connections) {
-		if (connection.first == signal) {
-			std::cout << std::endl << "Signal to " << connection.second->handler->get_name();
-			std::cout << " neighbors:\n";
-			std::cout << '\t' << neighbors->top << std::endl;
-			std::cout << neighbors->left << '\t' << std::endl;
-			std::cout << neighbors->right << std::endl;
-			std::cout << '\t' << neighbors->bot << std::endl;
-			top = (dynamic_cast<TopSnoopy*>(connection.second->handler)->*connection.second->slots->tsnp)(neighbors);
-			right = (dynamic_cast<RightSnoopy*>(connection.second->handler)->*connection.second->slots->rsnp)(neighbors);
-			bot = (dynamic_cast<BotSnoopy*>(connection.second->handler)->*connection.second->slots->bsnp)(neighbors);
-			left = (dynamic_cast<LeftSnoopy*>(connection.second->handler)->*connection.second->slots->lsnp)(neighbors);
-		}
-	}
+	
+	if (connections.first != signal)
+		return 0;
+	std::cout << std::endl << "Signal to " << connections.second->handlers.bot->get_name();
+	std::cout << " neighbors:\n";
+	std::cout << '\t' << neighbors->top << std::endl;
+	std::cout << neighbors->left << '\t' << std::endl;
+	std::cout << neighbors->right << std::endl;
+	std::cout << '\t' << neighbors->bot << std::endl;
+			
+	answers.push_back((connections.second->handlers.top->*connections.second->slots->tsnp)(neighbors));
+	answers.push_back((connections.second->handlers.right->*connections.second->slots->rsnp)(neighbors));
+	answers.push_back((connections.second->handlers.bot->*connections.second->slots->bsnp)(neighbors));
+	answers.push_back((connections.second->handlers.left->*connections.second->slots->lsnp)(neighbors));
+	for (auto const& line : answers)
+		if (step(line))
+			break;
+	return flag;
 }
 
 neighbors* Owner::loop_survey()
 {
-	return &take_neigh(current_unit);
+	return &take_neighbors(current_unit);
 }
 
-void Owner::step(std::string message) {
+ bool Owner::step(std::string message) {
+	field[current_unit.row][current_unit.col] = 'F';
 	if (message[message.length() - 1] == '2')
-		return;
+		 return 0;
 	switch (message[0])
 	{
 	case't':
@@ -101,15 +99,14 @@ void Owner::step(std::string message) {
 		current_unit.col--;
 		break;
 	default:
-		break;
+		return 0;
 	}
-	field[current_unit.row][current_unit.col] = 'f';
+	return 1;
 }
-
 
 //------------------------------------------------------------------------------------
 
-neighbors Owner::take_neigh(position elem)const {
+neighbors Owner::take_neighbors(position elem)const {
 	neighbors symb;
 	if (elem.row < 0 || elem.col < 0)
 		exit(1);
@@ -170,9 +167,24 @@ neighbors Owner::take_neigh(position elem)const {
 }
 
 void process(std::istream*, Owner* matrix) {
+	looper loop = &Owner::loop_survey;
+
 	tsnooper top = &TopSnoopy::IsUnitHere;
 	rsnooper right = &RightSnoopy::IsUnitHere;
 	bsnooper bot = &BotSnoopy::IsUnitHere;
 	lsnooper left = &LeftSnoopy::IsUnitHere;
 	snoopers slots = { top,right,bot,left };
+
+	TopSnoopy* Top = new TopSnoopy;
+	RightSnoopy* Right = new RightSnoopy;
+	BotSnoopy* Bot = new BotSnoopy;
+	LeftSnoopy* Left = new LeftSnoopy;
+	pack headers = { Top,Right,Bot,Left };
+
+	matrix->set_connection(loop, headers, slots, 1);
+	/*Top->set_connection(matrix)
+	for (;;) {
+		if()
+	}*/
 }
+

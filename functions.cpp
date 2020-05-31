@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include"functions.h"
+#include "owner.h"
+#include "snoopes.h"
 
 using std::cin;
 using std::cout;
@@ -57,3 +59,4 @@ std::istream* selector(const std::string first_line, const std::string second_li
 	}
 	return &cin;
 }
+
