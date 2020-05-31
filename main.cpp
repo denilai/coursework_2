@@ -32,13 +32,18 @@ std::string switcher() {
 
 std::istream* selector(const std::string first_line, const std::string second_line) {
 	std::string Name;
-	int answer;
+	int answer=0;
 	cout << "\nChoose one option:" << endl;
 	cout << "-------------------" << endl;
 	cout << first_line << endl;
 	cout << second_line << endl;
 	cout << ">";
 	cin >> answer;
+	if (cin.fail()) {
+		std::cin.clear(); 
+		std::cin.ignore(100000, '\n');
+		return selector(first_line, second_line);
+	}
 	cout << "\n";
 	if (!(answer == 1 || answer == 2))
 		return selector(first_line, second_line);
