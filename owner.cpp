@@ -35,17 +35,17 @@ bool Owner::get_el(position elem)const {
 	return field[elem.row][elem.col] == '1' ? true : false;
 }
 
-void Owner::set_connection(sig_ptr_t signal, Snoopy* handler, slt_ptr_t slot, const int sig_num) {
-	for (auto it = connections.begin(); it != connections.end(); it++)
-		if (it->second->sig_num == sig_num)
-			return;
-	sig_info_t* din_struct = new sig_info_t;
-	din_struct->handler = handler;
-	din_struct->slot = slot;
-	din_struct->sig_num = sig_num;
-	connections.push_back(std::make_pair(signal, din_struct));
-	return;
-}
+//void Owner::set_connection(sig_ptr_t signal, Snoopy* handler, slt_ptr_t slot, const int sig_num) {
+//	for (auto it = connections.begin(); it != connections.end(); it++)
+//		if (it->second->sig_num == sig_num)
+//			return;
+//	sig_info_t* din_struct = new sig_info_t;
+//	din_struct->handler = handler;
+//	din_struct->slot = slot;
+//	din_struct->sig_num = sig_num;
+//	connections.push_back(std::make_pair(signal, din_struct));
+//	return;
+//}
 
 void Owner::delete_connection(const int sig_num) {
 	for (auto it = connections.begin(); it != connections.end(); it++)
@@ -55,16 +55,16 @@ void Owner::delete_connection(const int sig_num) {
 		}
 }
 
-void Owner::emit_signal(sig_ptr_t signal, std::string& message) {
-	(this->*signal)(message);
-	for (auto const& connection : connections) {
-		if (connection.first == signal) {
-			std::cout << std::endl << "Signal to " << connection.second->handler->get_name();
-			std::cout << " Text: " << "Owner "<<dim<<"x"<<dim << "-> ";
-			(connection.second->handler->*connection.second->slot)(message);
-		}
-	}
-}
+//void Owner::emit_signal(sig_ptr_t signal, std::string& message) {
+//	(this->*signal)(message);
+//	for (auto const& connection : connections) {
+//		if (connection.first == signal) {
+//			std::cout << std::endl << "Signal to " << connection.second->handler->get_name();
+//			std::cout << " Text: " << "Owner "<<dim<<"x"<<dim << "-> ";
+//			(connection.second->handler->*connection.second->slot)(message);
+//		}
+//	}
+//}
 
 
 neighbours Owner::take_3x3(position elem)const {
@@ -127,3 +127,10 @@ neighbours Owner::take_3x3(position elem)const {
 	return symb;
 }
 
+void process(std::istream*, Owner* matrix){
+	sig_ptr_t r = &Snoopy::IsUnitHere;
+	sig_ptr_t signal_h = reinterpret_cast<sig_ptr_t>(&Owner::take_3x3);
+
+	Snoopy *a = new LeftSnoopy;
+	neighbours t;
+}

@@ -139,11 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="functions.h" />
     <ClInclude Include="owner.h" />
     <ClInclude Include="snoopes.h" />
     <ClInclude Include="sructures.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="functions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="owner.cpp" />
     <ClCompile Include="snoopes.cpp" />
