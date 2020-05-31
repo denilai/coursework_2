@@ -1,8 +1,7 @@
 #ifndef MATRIX_MASTER
 #define MATRIX_MASTER
-#include <vector>
 #include "sructures.h"
-#include "snoopes.h"
+
 
 class Owner{
 public:
@@ -16,11 +15,12 @@ public:
 	//-----------------------------------------------------------------//
 
 	void set_connection(looper, Snoopy*, snoopers, const int); // установить соеднинение
-	void emit_signal(looper);						          // испустить сигнал, опопвестить обработчики
+	void emit_signal(looper,stepper);						          // испустить сигнал, опопвестить обработчики
 	void delete_connection(const int);                            // разорвать связь
 	neighbors* loop_survey();											// опрос обработчиков на текущей итерации
 
 	explicit Owner(const int dim=0);
+	Owner(Owner*old);
 	void create_field(std::istream*);// метод задания поля
 	void show_matrix()const;// метод вывода поля
 	neighbors take_neigh(position) const;// использовать catch{}, метод передает структуру соседей

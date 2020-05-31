@@ -1,8 +1,12 @@
 #ifndef STRUCTURES
 #define STRUCTURES
-#include <queue>
+#include <vector>
 #include <string>
 
+class LeftSnoopy;
+class RightSnoopy;
+class TopSnoopy;
+class BotSnoopy;
 
 typedef struct {// координаты элемента по сути просто std::pair
 	int row;
@@ -27,7 +31,8 @@ typedef std::string(LeftSnoopy::* lsnooper)(neighbors*);// методы поиска единицы
 typedef std::string(RightSnoopy::* rsnooper)(neighbors*);// методы поиска единицы справа
 typedef std::string(TopSnoopy::* tsnooper)(neighbors*);// методы поиска единицы сверху
 typedef std::string(BotSnoopy::* bsnooper)(neighbors*);// методы поиска единицы снизу
-typedef void (Owner::* stepper)(std::string&);// методы замены и шагов
+
+typedef void (Owner::* stepper)(std::string);// методы замены и шагов
 typedef neighbors*(Owner::* looper)(void);// методы проведения итераций
 
 typedef struct {

@@ -1,7 +1,7 @@
-#include "functions.h"
 #include <iostream>
 #include <fstream>
-
+#include <string>
+#include"functions.h"
 
 using std::cin;
 using std::cout;

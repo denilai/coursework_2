@@ -1,10 +1,13 @@
-#include "owner.h"
 #include <iostream>
-#include <string>
+#include <vector>
+#include "owner.h"
+#include "snoopes.h"
 
 Owner::Owner(const int dim) :dim(dim), current_unit({-1,-1}) {
 	field.assign(dim, std::vector<char>(dim));
 }
+
+Owner::Owner(Owner* old) : dim(old->dim), current_unit(old->current_unit), field(old->field) {}
 
 void Owner::find_first_unit() {
 	for (int i=0, j = 0; i< dim; i++)
@@ -56,7 +59,8 @@ void Owner::delete_connection(const int sig_num) {
 		}
 }
 
-void Owner::emit_signal(looper signal) {
+void Owner::emit_signal(looper signal,stepper step) {
+	std::string top, right, bot, left;
 	neighbors *neighbors=(this->*signal)();
 	for (auto const& connection : connections) {
 		if (connection.first == signal) {
@@ -66,10 +70,10 @@ void Owner::emit_signal(looper signal) {
 			std::cout << neighbors->left << '\t' << std::endl;
 			std::cout << neighbors->right << std::endl;
 			std::cout << '\t' << neighbors->bot << std::endl;
-			(dynamic_cast<BotSnoopy*>(connection.second->handler)->*connection.second->slots->bsnp)(neighbors);
-			(dynamic_cast<LeftSnoopy*>(connection.second->handler)->*connection.second->slots->lsnp)(neighbors);
-			(dynamic_cast<TopSnoopy*>(connection.second->handler)->*connection.second->slots->tsnp)(neighbors);
-			(dynamic_cast<RightSnoopy*>(connection.second->handler)->*connection.second->slots->rsnp)(neighbors);
+			top = (dynamic_cast<TopSnoopy*>(connection.second->handler)->*connection.second->slots->tsnp)(neighbors);
+			right = (dynamic_cast<RightSnoopy*>(connection.second->handler)->*connection.second->slots->rsnp)(neighbors);
+			bot = (dynamic_cast<BotSnoopy*>(connection.second->handler)->*connection.second->slots->bsnp)(neighbors);
+			left = (dynamic_cast<LeftSnoopy*>(connection.second->handler)->*connection.second->slots->lsnp)(neighbors);
 		}
 	}
 }
