@@ -15,7 +15,7 @@ public:
 	//virtual void slot_template(std::string&);
 	//-----------------------------------------------------------------//
 
-	void set_connection(looper, Snoopy*, snooper, const int); // установить соеднинение
+	void set_connection(looper, Snoopy*, snoopers, const int); // установить соеднинение
 	void emit_signal(looper);						          // испустить сигнал, опопвестить обработчики
 	void delete_connection(const int);                            // разорвать связь
 	neighbors* loop_survey();											// опрос обработчиков на текущей итерации

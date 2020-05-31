@@ -36,13 +36,13 @@ bool Owner::get_el(position elem)const {
 }
 
 //----------------------- сигналы-обработчики--------------------------------------------
-void Owner::set_connection(looper signal, Snoopy* handler, snooper slot, const int sig_num) {
+void Owner::set_connection(looper signal, Snoopy* handler, snoopers slots, const int sig_num) {
 	for (auto it = connections.begin(); it != connections.end(); it++)
 		if (it->second->sig_num == sig_num)
 			return;
 	to_snp_info_t* din_struct = new to_snp_info_t;
 	din_struct->handler = handler;
-	din_struct->slot = slot;
+	din_struct->slots = &slots;
 	din_struct->sig_num = sig_num;
 	connections.push_back(std::make_pair(signal, din_struct));
 	return;
@@ -66,7 +66,10 @@ void Owner::emit_signal(looper signal) {
 			std::cout << neighbors->left << '\t' << std::endl;
 			std::cout << neighbors->right << std::endl;
 			std::cout << '\t' << neighbors->bot << std::endl;
-			(connection.second->handler->*connection.second->slot)(neighbors);
+			(dynamic_cast<BotSnoopy*>(connection.second->handler)->*connection.second->slots->bsnp)(neighbors);
+			(dynamic_cast<LeftSnoopy*>(connection.second->handler)->*connection.second->slots->lsnp)(neighbors);
+			(dynamic_cast<TopSnoopy*>(connection.second->handler)->*connection.second->slots->tsnp)(neighbors);
+			(dynamic_cast<RightSnoopy*>(connection.second->handler)->*connection.second->slots->rsnp)(neighbors);
 		}
 	}
 }
@@ -139,5 +142,9 @@ neighbors Owner::take_neigh(position elem)const {
 }
 
 void process(std::istream*, Owner* matrix){
-	snooper left = &LeftSnoopy::IsUnitHere;
+	tsnooper top = &TopSnoopy::IsUnitHere;
+	rsnooper right = &RightSnoopy::IsUnitHere;
+	bsnooper bot = &BotSnoopy::IsUnitHere;
+	lsnooper left = &LeftSnoopy::IsUnitHere;
+	snoopers slots = { top,right,bot,left };
 }
