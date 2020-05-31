@@ -4,6 +4,9 @@
 #include <string>
 
 class Snoopy {
+	// суперкласс для всех ищеек (Snoopy)
+	// Нужен для того, чтобы иметь доступ ко всем экземплярам
+	// ищеек через указатель на родительский класс
 public:
 	virtual std::string get_name()const = 0;
 private:

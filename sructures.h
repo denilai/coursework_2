@@ -2,12 +2,14 @@
 #define STRUCTURES
 #include <queue>
 
-typedef struct {
+typedef struct {// структура, предстваляющая
+				// элемент массива как двумерную структуру (координаты)
+				// по сути просто std::pair
 	int row;
 	int col;
 }position;
 
-typedef struct {
+typedef struct {// соседи какого-либо элемента массива. 
 	bool top = false;
 	bool right = false;
 	bool bot = false;;
@@ -18,13 +20,13 @@ typedef struct {
 class Owner;
 class Snoopy;
 
-typedef void (Owner::* sig_ptr_t)(std::string&);
-typedef void (Snoopy::* slt_ptr_t)(std::string&);
+typedef void (Owner::* sig_ptr_t)(std::string&);// указатели на методы Owner
+typedef void (Snoopy::* slt_ptr_t)(std::string&);// указатели на методы Snoopy
 
-typedef  struct {
-	Snoopy* handler;
-	slt_ptr_t slot;
-	int sig_num;
+typedef  struct {// Структура, отражающая всю информацию о сигнале
+	Snoopy* handler;// обработчик
+	slt_ptr_t slot;// метод обработчика
+	int sig_num;// идентификатор сигнала
 }sig_info_t;
 
 typedef  struct {
