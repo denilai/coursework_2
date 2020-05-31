@@ -3,21 +3,21 @@
 #include "owner.h"
 #include "snoopes.h"
 
-Owner::Owner(const int dim) :dim(dim), current_unit({-1,-1}) {
+Owner::Owner(const int dim) :dim(dim), current_unit({ -1,-1 }) {
 	field.assign(dim, std::vector<char>(dim));
 }
 
 Owner::Owner(Owner* old) : dim(old->dim), current_unit(old->current_unit), field(old->field) {}
 
 void Owner::find_first_unit() {
-	for (int i=0, j = 0; i< dim; i++)
+	for (int i = 0, j = 0; i < dim; i++)
 		if (field[i][j] == '1') {
 			current_unit = { i,j };
 			return;
 		}
 }
 
-void Owner::create_field(std::istream*stream) {
+void Owner::create_field(std::istream* stream) {
 	std::string line;
 	for (int i = 0; i < dim; i++) {
 		*stream >> line;
@@ -26,7 +26,7 @@ void Owner::create_field(std::istream*stream) {
 	}
 }
 
-void Owner::show_matrix() const{
+void Owner::show_matrix() const {
 	for (auto vec : field) {
 		for (auto el : vec)
 			std::cout << el;
@@ -59,14 +59,14 @@ void Owner::delete_connection(const int sig_num) {
 		}
 }
 
-void Owner::emit_signal(looper signal,stepper step) {
+void Owner::emit_signal(looper signal, stepper step) {
 	std::string top, right, bot, left;
-	neighbors *neighbors=(this->*signal)();
+	neighbors* neighbors = (this->*signal)();
 	for (auto const& connection : connections) {
 		if (connection.first == signal) {
 			std::cout << std::endl << "Signal to " << connection.second->handler->get_name();
 			std::cout << " neighbors:\n";
-			std::cout << '\t'<<neighbors->top << std::endl;
+			std::cout << '\t' << neighbors->top << std::endl;
 			std::cout << neighbors->left << '\t' << std::endl;
 			std::cout << neighbors->right << std::endl;
 			std::cout << '\t' << neighbors->bot << std::endl;
@@ -83,6 +83,30 @@ neighbors* Owner::loop_survey()
 	return &take_neigh(current_unit);
 }
 
+void Owner::step(std::string message) {
+	if (message[message.length() - 1] == '2')
+		return;
+	switch (message[0])
+	{
+	case't':
+		current_unit.row++;
+		break;
+	case'r':
+		current_unit.col++;
+		break;
+	case'b':
+		current_unit.row--;
+		break;
+	case'l':
+		current_unit.col--;
+		break;
+	default:
+		break;
+	}
+	field[current_unit.row][current_unit.col] = 'f';
+}
+
+
 //------------------------------------------------------------------------------------
 
 neighbors Owner::take_neigh(position elem)const {
@@ -91,10 +115,10 @@ neighbors Owner::take_neigh(position elem)const {
 		exit(1);
 	if (elem.row >= dim || elem.col >= dim)
 		exit(2);
-	if (elem.row % (dim - 1) == 0 && elem.col % (dim - 1) == 0){//рассматриваем уловые элементы
+	if (elem.row % (dim - 1) == 0 && elem.col % (dim - 1) == 0) {//рассматриваем уловые элементы
 		if (elem.row == elem.col == 0) {// рассматриваем верхний левый угол
-			symb.right = field[0][1]=='1'?true:false;
-			symb.bot = field[1][0]=='1'?true:false;
+			symb.right = field[0][1] == '1' ? true : false;
+			symb.bot = field[1][0] == '1' ? true : false;
 			return symb;
 		}
 		if (elem.row == 0 && elem.col == dim - 1) {// рассматриваем верхний правый угол
@@ -102,38 +126,38 @@ neighbors Owner::take_neigh(position elem)const {
 			symb.bot = field[1][dim - 1] == '1' ? true : false;
 			return symb;
 		}
-		if (elem.row == dim-1 && elem.col == 0) {// рассматриваем нижний левый угол
-			symb.top = field[dim-2][0] == '1' ? true : false;
-			symb.right = field[dim-1][1] == '1' ? true : false;
+		if (elem.row == dim - 1 && elem.col == 0) {// рассматриваем нижний левый угол
+			symb.top = field[dim - 2][0] == '1' ? true : false;
+			symb.right = field[dim - 1][1] == '1' ? true : false;
 			return symb;
 		}
 		if (elem.row == elem.col == dim - 1) {// рассматриваем нижний правый угол
-			symb.top = field[dim - 2][dim-1] == '1' ? true : false;
-			symb.left = field[dim - 1][dim-2] == '1' ? true : false;
+			symb.top = field[dim - 2][dim - 1] == '1' ? true : false;
+			symb.left = field[dim - 1][dim - 2] == '1' ? true : false;
 			return symb;
 		}
 	}
 	if (elem.row == 0) {// рассматриваем первую строку (без углов)
-		symb.left = field[elem.col][elem.col-1] == '1' ? true : false;
-		symb.right = field[elem.col][elem.col +1] == '1' ? true : false;
-		symb.bot = field[elem.col+1][elem.col] == '1' ? true : false;
+		symb.left = field[elem.col][elem.col - 1] == '1' ? true : false;
+		symb.right = field[elem.col][elem.col + 1] == '1' ? true : false;
+		symb.bot = field[elem.col + 1][elem.col] == '1' ? true : false;
 		return symb;
 	}
 	if (elem.row == dim - 1) {// рассматриваем последнюю строку (без углов)
 		symb.left = field[elem.row][elem.col - 1] == '1' ? true : false;
 		symb.right = field[elem.row][elem.col + 1] == '1' ? true : false;
-		symb.top = field[elem.row-1][elem.col] == '1' ? true : false;
+		symb.top = field[elem.row - 1][elem.col] == '1' ? true : false;
 		return symb;
 	}
 	if (elem.col == 0) {// рассматриваем левую строку (без углов)
-		symb.bot = field[elem.row+1][elem.col] == '1' ? true : false;
-		symb.right = field[elem.row][elem.col+1] == '1' ? true : false;
-		symb.top = field[elem.row-1][elem.col] == '1' ? true : false;
+		symb.bot = field[elem.row + 1][elem.col] == '1' ? true : false;
+		symb.right = field[elem.row][elem.col + 1] == '1' ? true : false;
+		symb.top = field[elem.row - 1][elem.col] == '1' ? true : false;
 		return symb;
 	}
-	if (elem.col == dim-1) {// рассматриваем правую строку (без углов)
+	if (elem.col == dim - 1) {// рассматриваем правую строку (без углов)
 		symb.bot = field[elem.row + 1][elem.col] == '1' ? true : false;
-		symb.left = field[elem.row][elem.col -1] == '1' ? true : false;
+		symb.left = field[elem.row][elem.col - 1] == '1' ? true : false;
 		symb.top = field[elem.row - 1][elem.col] == '1' ? true : false;
 		return symb;
 	}
@@ -145,7 +169,7 @@ neighbors Owner::take_neigh(position elem)const {
 	return symb;
 }
 
-void process(std::istream*, Owner* matrix){
+void process(std::istream*, Owner* matrix) {
 	tsnooper top = &TopSnoopy::IsUnitHere;
 	rsnooper right = &RightSnoopy::IsUnitHere;
 	bsnooper bot = &BotSnoopy::IsUnitHere;

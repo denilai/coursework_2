@@ -19,7 +19,7 @@ Snoopy::~Snoopy() {}
 //------------------------------------class LeftSnoopy---------------------------------//
 
 std::string LeftSnoopy::IsUnitHere(neighbors* symb) {
-	return symb->left ? "signal_1" : "signal_2";
+	return symb->left ? "lsignal_1" : "lsignal_2";
 }
 
 std::string LeftSnoopy::get_name()const { return "LeftSnoopy"; }
@@ -31,7 +31,7 @@ void LeftSnoopy::emit_signal(neighbors* symb) {
 //------------------------------------class RightSnoopy---------------------------------//
 
 std::string RightSnoopy::IsUnitHere(neighbors* symb) {
-	return symb->right ? "signal_1" : "signal_2";
+	return symb->right ? "rsignal_1" : "rsignal_2";
 }
 
 std::string RightSnoopy::get_name()const { return "RightSnoopy"; }
@@ -39,7 +39,7 @@ std::string RightSnoopy::get_name()const { return "RightSnoopy"; }
 //------------------------------------class TopSnoopy---------------------------------//
 
 std::string TopSnoopy::IsUnitHere(neighbors* symb) {
-	return symb->top ? "signal_1" : "signal_2";
+	return symb->top ? "tsignal_1" : "tsignal_2";
 }
 
 std::string TopSnoopy::get_name()const { return "TopSnoopy"; }
@@ -47,7 +47,7 @@ std::string TopSnoopy::get_name()const { return "TopSnoopy"; }
 //------------------------------------class BotSnoopy---------------------------------//
 
 std::string BotSnoopy::IsUnitHere(neighbors* symb) {
-	return symb->bot ? "signal_1" : "signal_2";
+	return symb->bot ? "bsignal_1" : "bsignal_2";
 }
 
 std::string BotSnoopy::get_name()const { return "BotSnoopy"; }
