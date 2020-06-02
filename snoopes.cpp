@@ -1,27 +1,85 @@
+#include "sructures.h"
+#include "owner.h"
 #include "snoopes.h"
 
-Snoopy::~Snoopy() {}
 
-std::string LeftSnoopy::IsUnitOnLeft(neighbours symb) {
-	return symb.left ? "signal_1" : "signal_2";
-}
+//------------------------------------class LeftSnoopy---------------------------------//
+
+std::string LeftSnoopy::IsUnitHere(const neighbors symb) { return symb.left ? "lsignal_1" : "lsignal_2"; }
+
 std::string LeftSnoopy::get_name()const { return "LeftSnoopy"; }
-LeftSnoopy::~LeftSnoopy() {}
 
-std::string RightSnoopy::IsUnitOnRight(neighbours symb) {
-	return symb.right ? "signal_1" : "signal_2";
+bool LeftSnoopy::emit_signal(const neighbors symb) { return (handler->*slot)(IsUnitHere(symb));}
+
+void LeftSnoopy::delete_connection() {
+	handler = nullptr;
+	slot = nullptr;
 }
+
+void LeftSnoopy::set_connection(Owner* header, stepper &slot) {
+	delete_connection();
+	this->handler = header;
+	this->slot = (slot);
+}
+
+//------------------------------------class RightSnoopy---------------------------------//
+
+std::string RightSnoopy::IsUnitHere(const neighbors symb) { return symb.right ? "rsignal_1" : "rsignal_2"; }
+
 std::string RightSnoopy::get_name()const { return "RightSnoopy"; }
-RightSnoopy::~RightSnoopy() {}
 
-std::string TopSnoopy::IsUnitOnTop(neighbours symb) {
-	return symb.top ? "signal_1" : "signal_2";
-}
-std::string TopSnoopy::get_name()const { return "TopSnoopy"; }
-TopSnoopy::~TopSnoopy() {}
+bool RightSnoopy::emit_signal(const neighbors symb) { return (handler->*slot)(IsUnitHere(symb)); }
 
-std::string BotSnoopy::IsUnitOnBot(neighbours symb) {
-	return symb.bot ? "signal_1" : "signal_2";
+void RightSnoopy::delete_connection() {
+	handler = nullptr;
+	slot = nullptr;
 }
+
+void RightSnoopy::set_connection(Owner* header, stepper &slot) {
+	delete_connection();
+	this->handler = header;
+	this->slot = (slot);
+}
+
+//------------------------------------class TopSnoopy---------------------------------//
+
+std::string TopSnoopy::IsUnitHere(const neighbors symb) { 
+	return symb.top ? "tsignal_1" : "tsignal_2"; }
+
+std::string TopSnoopy::get_name()const { 
+	return "TopSnoopy"; }
+
+bool TopSnoopy::emit_signal(const neighbors symb) { 
+	return (handler->*(*slot))(IsUnitHere(symb)); }
+
+void TopSnoopy::delete_connection() {
+	handler = nullptr;
+	slot = nullptr;
+}
+
+void TopSnoopy::set_connection(Owner* header, stepper &slot) {
+	delete_connection();
+	this->handler = header;
+	this->slot = &(slot);
+}
+
+//------------------------------------class BotSnoopy---------------------------------//
+
+std::string BotSnoopy::IsUnitHere(const neighbors symb) { return symb.bot ? "bsignal_1" : "bsignal_2"; }
+
 std::string BotSnoopy::get_name()const { return "BotSnoopy"; }
-BotSnoopy::~BotSnoopy() {}
+
+bool BotSnoopy::emit_signal(const neighbors symb) { return (handler->*slot)(IsUnitHere(symb)); }
+
+void BotSnoopy::delete_connection() {
+	handler = nullptr;
+	slot = nullptr;
+}
+
+void BotSnoopy::set_connection(Owner* header, stepper &slot) {
+	delete_connection();
+	this->handler = header;
+	this->slot = (slot);
+}
+
+//-------------------------------------------------------------------------------------//

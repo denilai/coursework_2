@@ -1,44 +1,65 @@
 #ifndef SNOOPY
 #define SNOOPY
-#include "sructures.h"
 #include <string>
+#include "sructures.h"
 
-class Snoopy {
-	// суперкласс для всех ищеек (Snoopy)
-	// Нужен для того, чтобы иметь доступ ко всем экземплярам
-	// ищеек через указатель на родительский класс
+class Owner;
+
+
+class LeftSnoopy{
 public:
-	virtual std::string get_name()const = 0;
-protected:
-	virtual ~Snoopy();
+	Owner* handler = nullptr;
+	stepper slot = nullptr;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors) ;				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
-class LeftSnoopy :public Snoopy {
+class RightSnoopy  {
 public:
-	std::string IsUnitOnLeft(neighbours);
-	virtual std::string get_name()const override;
-	virtual ~LeftSnoopy();
+	Owner* handler;
+	stepper slot;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
-class RightSnoopy :public Snoopy {
+class TopSnoopy  {
 public:
-	std::string IsUnitOnRight(neighbours);
-	virtual std::string get_name()const override;
-	virtual ~RightSnoopy();
+	Owner* handler;
+	stepper* slot;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
-class TopSnoopy :public Snoopy {
+class BotSnoopy  {
 public:
-	std::string IsUnitOnTop(neighbours);
-	virtual std::string get_name()const override;
-	virtual ~TopSnoopy();
-};
+	Owner* handler = nullptr;
+	stepper slot = nullptr;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
 
-class BotSnoopy :public Snoopy {
-public:
-	std::string IsUnitOnBot(neighbours);
-	virtual std::string get_name()const override;
-	virtual ~BotSnoopy();
 };
 
 #endif

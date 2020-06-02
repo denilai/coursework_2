@@ -1,35 +1,31 @@
 #ifndef MATRIX_MASTER
 #define MATRIX_MASTER
-#include <vector>
 #include "sructures.h"
-#include "snoopes.h"
 
-class Owner{
-public:
+class Owner {
 
-	//-----поля для реализации функционала сигналов и обработчиков-----//
-	connects_t connections;
-	//----------------------protected signals--------------------------//
-	//virtual void signal_template(std::string&);
-	//----------------------protected slots----------------------------//
-	//virtual void slot_template(std::string&);
-	//-----------------------------------------------------------------//
-
-	void set_connection(sig_ptr_t, Snoopy*, slt_ptr_t, const int);// установить соеднинение
-	void emit_signal(sig_ptr_t, std::string&);                    // испустить сигнал, опопвестить обработчики
-	void delete_connection(const int);                            // разорвать связь
-
-
-	explicit Owner(const int dim=0);
-	void create_field(std::istream*);// метод задания поля
-	void show_matrix()const;// метод вывода поля
-	neighbours take_3x3(position) const;// использовать catch{}, метод передает структуру соседей
-	bool get_el(position) const;// метод возвращает элемент по позиции 
-	void find_first_unit();
 private:
-	const int dim;// размерность поля
-	std::vector<std::vector<char>> field;// поле
-	position current_unit;// координата последней найденной единицы
+	std::vector<std::string> field;						// поле
+	position current_unit;										// координата последней найденной единицы
+public:
+	to_snp_pair_t connections;
+
+	void set_connection(looper, pack, snoopers, const int);		// установить соеднинение
+	bool emit_signal(looper);							// испустить сигнал, опопвестить обработчики
+	void delete_connection(const int);							// разорвать связь
+	neighbors loop_survey();									// опрос обработчиков на текущей итерации
+	bool step(std::string);
+	explicit Owner(const int dim = 0);
+	Owner(const Owner* old);
+	char& operator[](position);
+	void create_field(std::istream&);							// метод задания поля
+	void show_matrix()const;									// метод вывода поля
+	neighbors take_neighbors(position) const;						// использовать catch{}, метод передает структуру соседей
+	void find_first_unit();
+	char take_value(position);
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
 #endif

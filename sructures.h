@@ -1,11 +1,15 @@
 #ifndef STRUCTURES
 #define STRUCTURES
-#include <queue>
+#include <vector>
 #include <string>
 
-typedef struct {// структура, предстваляющая
-				// элемент массива как двумерную структуру (координаты)
-				// по сути просто std::pair
+class Owner;
+class LeftSnoopy;
+class RightSnoopy;
+class TopSnoopy;
+class BotSnoopy;
+
+typedef struct {// координаты элемента по сути просто std::pair
 	int row;
 	int col;
 }position;
@@ -15,38 +19,42 @@ typedef struct {// соседи какого-либо элемента массива.
 	bool right = false;
 	bool bot = false;;
 	bool left = false;
-}neighbours;
+}neighbors;
 
+typedef bool(LeftSnoopy::* lsnooper)(neighbors const);		// методы поиска единицы слева
+typedef bool(RightSnoopy::* rsnooper)(neighbors const);		// методы поиска единицы справа
+typedef bool(TopSnoopy::* tsnooper)(neighbors const);			// методы поиска единицы сверху
+typedef bool(BotSnoopy::* bsnooper)(neighbors const);			// методы поиска единицы снизу
 
-class Owner;
-class Snoopy;
+typedef bool (Owner::* stepper)(std::string);					// методы замены и шагов
+typedef neighbors(Owner::* looper)(void);						// методы проведения итераций
 
-typedef void (Owner::* sig_ptr_t)(std::string&);// указатели на методы Owner
-typedef void (Snoopy::* slt_ptr_t)(std::string&);// указатели на методы Snoopy
+typedef struct {//  стурктура всех указателей на методы объектов-обработчиков
+	tsnooper tsnp;
+	rsnooper rsnp;
+	bsnooper bsnp;
+	lsnooper lsnp;	
+} snoopers;					
+
+typedef struct {//  стурктура всех указателей объекты-обработчики
+	TopSnoopy* top;
+	RightSnoopy* right;
+	BotSnoopy* bot;
+	LeftSnoopy* left;
+}pack;
 
 typedef  struct {// Структура, отражающая всю информацию о сигнале
-	Snoopy* handler;// обработчик
-	slt_ptr_t slot;// метод обработчика
-	int sig_num;// идентификатор сигнала
-}sig_info_t;
-
-typedef  struct {
+	pack handlers;// обработчик
+	snoopers slots;// ****
 	int sig_num;
-	Owner* transmitter;
-	Snoopy* handler;
-	sig_ptr_t signal;
-}input_form_t;// форма, аналогичная форме задания связей
+}to_snp_info_t;
 
-typedef  struct {
-	Owner* transmitter;
-	sig_ptr_t signal;
-}emit_struct_t; // структура для вызова метода emit_signal
+//typedef  struct {// Структура, отражающая всю информацию о сигнале
+//	Owner* handler;// обработчик
+//	stepper* slot;// методы обработчика
+//	int sig_num;
+//}to_own_info_t;
 
-
-typedef std::pair<sig_ptr_t, sig_info_t*> transm_info_t;// полная информация о связи сигнал-обработчик
-
-typedef std::vector<transm_info_t> connects_t;// разъемы 
-typedef std::vector<emit_struct_t> unique_callers_vec_t; // список уникальных объектов-передатчиков и их связных праметров
-typedef std::queue<input_form_t> link_queue_t;// очередь объявления связей 
+typedef std::pair<looper, to_snp_info_t> to_snp_pair_t;// полная информация о связи Owner->Snoopy
 
 #endif
