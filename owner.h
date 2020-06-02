@@ -18,6 +18,8 @@ public:
 	explicit Owner(const int dim = 0);
 	Owner(const Owner* old);
 	char& operator[](position);
+	friend char& operator%(Owner*, position);
+	position get_curr_unit();
 	void create_field(std::istream&);							// метод задания поля
 	void show_matrix()const;									// метод вывода поля
 	neighbors take_neighbors(position) const;					// использовать catch{}, метод передает структуру соседей

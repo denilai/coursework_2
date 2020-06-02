@@ -10,13 +10,18 @@ Owner::Owner(int dim) :current_unit({ -1,-1 }) {
 Owner::Owner(const Owner* old) : current_unit(old->current_unit), field(old->field) {}
 
 
-
 void Owner::find_first_unit() {
 	for (auto &line:field)
 		if (line[0] == '1') {
 			current_unit = { &line - &field.front(),0};
 			return;
 		}
+}
+
+position Owner::get_curr_unit()
+{
+	this->find_first_unit();
+	return current_unit;
 }
 
 void Owner::create_field(std::istream& stream) {
@@ -28,10 +33,11 @@ void Owner::create_field(std::istream& stream) {
 }
 
 void Owner::show_matrix() const {
-	for (auto vec : field) {
+	for (auto &vec : field) {
+		if (&vec != &field.front())
+			std::cout << std::endl;
 		for (auto el : vec)
 			std::cout << el;
-		std::cout << std::endl;
 	}
 }
 
@@ -65,14 +71,17 @@ bool Owner::emit_signal(looper signal) {
 	flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
 	neighbors = (this->*signal)();
 	flags.push_back((connections.second.handlers.left->*connections.second.slots.lsnp)(neighbors));
-	show_matrix();
+	//show_matrix();
 	std::cout << std::endl;
 	for (auto const& flag : flags)
 		if (flag) {
 			//field[current_unit.row][current_unit.col] = 'F';
 			return 1;
 		}
-	field[current_unit.row][current_unit.col] = 'F';
+	try {
+		this%current_unit='F';
+	}
+	catch(...){};
 	return 0;
 }
 
@@ -88,12 +97,14 @@ neighbors Owner::loop_survey()
 
  bool Owner::step(std::string message) {
 	if (current_unit.col < 0 || current_unit.row < 0) {
-		std::cout << "Out of array";
 		return false;
 	}
 	if (message[message.length() - 1] == '2')
 		 return 0;
-	field[current_unit.row][current_unit.col] = 'F';
+	try {
+		this% current_unit = 'F';
+	}
+	catch (...) {};
 	switch (message[0])
 	{
 	case't':

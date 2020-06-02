@@ -2,7 +2,19 @@
 #include "snoopes.h"
 #include "sructures.h"
 
+char& operator%(Owner* matrix, position pos){
+	if (pos.col < 0 || pos.row < 0)
+		throw 'a';
+	if (pos.col >= matrix->field.size() || pos.row >= matrix->field.size())
+		throw 'b';
+	return matrix->field[pos.row][pos.col];
+}
+
 void process(Owner* matrix){
+	if (matrix->get_curr_unit().row == -1) {
+		matrix->show_matrix();
+		return;
+	}
 	TopSnoopy Top;
 	RightSnoopy Right;
 	BotSnoopy Bot;

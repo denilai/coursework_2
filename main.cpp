@@ -11,7 +11,7 @@ using std::string;
 inline std::string switcher() {
 	int res = 0;
 	std::string Name;
-	cout << "Select file:\n1)Test1.txt\n2)Test2.txt\n3)Test3.txt\n4)Test4.txt\n5)Test5.txt\n6)Test6.txt\n" << endl;
+	cout << "Select file:\n1)Test1.txt\n2)Test2.txt\n3)Test3.txt\n4)Test4.txt\n5)Test5.txt\n6)Test6.txt\n7)Test7.txt\n" << endl;
 	cin >> res;
 	switch (res) {
 	case 1: Name = "Test1.txt";
@@ -25,6 +25,8 @@ inline std::string switcher() {
 	case 5: Name = "Test5.txt";
 		break;
 	case 6: Name = "Test6.txt";
+		break;
+	case 7: Name = "Test7.txt";
 		break;
 	}
 	return Name;
@@ -64,7 +66,6 @@ int main() {
 	BotSnoopy Bot;
 	LeftSnoopy Left;*/
 	field.create_field(stream);
-	field.find_first_unit();
 	process(&field);
 	system("pause");
 	return 0;

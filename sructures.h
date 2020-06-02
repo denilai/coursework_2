@@ -21,8 +21,8 @@ typedef struct {// соседи какого-либо элемента массива.
 	bool left = false;
 }neighbors;
 
-typedef bool(LeftSnoopy::* lsnooper)(neighbors const);		// методы поиска единицы слева
-typedef bool(RightSnoopy::* rsnooper)(neighbors const);		// методы поиска единицы справа
+typedef bool(LeftSnoopy::* lsnooper)(neighbors const);			// методы поиска единицы слева
+typedef bool(RightSnoopy::* rsnooper)(neighbors const);			// методы поиска единицы справа
 typedef bool(TopSnoopy::* tsnooper)(neighbors const);			// методы поиска единицы сверху
 typedef bool(BotSnoopy::* bsnooper)(neighbors const);			// методы поиска единицы снизу
 
