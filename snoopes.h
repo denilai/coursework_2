@@ -4,45 +4,62 @@
 #include "sructures.h"
 
 class Owner;
-class Snoopy {// суперкласс для всех ищеек (Snoopy)
+
+
+class LeftSnoopy{
 public:
-	virtual std::string get_name() const = 0;
-	virtual std::string IsUnitHere(neighbors*) = 0;
-	virtual void set_connection(Owner*, stepper) final;			// установить соеднинение
-	virtual void emit_signal(neighbors*) = 0 ;					// испустить сигнал, опопвестить обработчики
-	virtual void delete_connection() final;						// разорвать связь
-protected:
-	stepper* slot = nullptr;
-	Owner* header = nullptr;
-	virtual ~Snoopy();
+	Owner* handler = nullptr;
+	stepper slot = nullptr;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors) ;				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
-class LeftSnoopy :public Snoopy{
+class RightSnoopy  {
 public:
-	virtual void emit_signal(neighbors*) final;				   // испустить сигнал, опопвестить обработчики
-	virtual std::string IsUnitHere(neighbors*) override final;
-	virtual std::string get_name()const override final;
+	Owner* handler;
+	stepper slot;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
-class RightSnoopy :public Snoopy {
+class TopSnoopy  {
 public:
-	virtual void emit_signal(neighbors*) final;					// испустить сигнал, опопвестить обработчики
-	virtual std::string IsUnitHere(neighbors*)override final;
-	virtual std::string get_name()const override final;
+	Owner* handler;
+	stepper* slot;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
+
 };
 
-class TopSnoopy :public Snoopy {
+class BotSnoopy  {
 public:
-	virtual void emit_signal(neighbors*) final;					// испустить сигнал, опопвестить обработчики
-	virtual std::string IsUnitHere(neighbors*)override final;
-	virtual std::string get_name()const override final;
-};
+	Owner* handler = nullptr;
+	stepper slot = nullptr;
+	void delete_connection();
+	void set_connection(Owner*, stepper&);
+	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
+	std::string IsUnitHere(const neighbors);
+	std::string get_name()const;
+	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
+	friend void process(Owner*);
 
-class BotSnoopy :public Snoopy {
-public:
-	virtual void emit_signal(neighbors*) final;					// испустить сигнал, опопвестить обработчики
-	virtual std::string IsUnitHere(neighbors*)override final;
-	virtual std::string get_name()const override final;
 };
 
 #endif
