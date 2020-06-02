@@ -58,19 +58,22 @@ void Owner::delete_connection(const int sig_num) {
 	connections = { nullptr ,{0,0}};
 };
 
+
 bool Owner::emit_signal(looper signal) {
 	bool flag = false;
 	std::vector<bool> flags;
 	if (connections.first != signal)
 		return 0;
 	neighbors neighbors = (this->*signal)();
+	if((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors))
+
 	flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
 	neighbors = (this->*signal)();
 	flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
 	neighbors = (this->*signal)();
 	flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
 	neighbors = (this->*signal)();
-	flags.push_back((connections.second.handlers.left->*connections.second.slots.lsnp)(neighbors));
+	//flags.push_back((connections.second.handlers.left->*connections.second.slots.lsnp)(neighbors));
 	//show_matrix();
 	std::cout << std::endl;
 	for (auto const& flag : flags)
