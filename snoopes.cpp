@@ -80,6 +80,7 @@ void BotSnoopy::set_connection(Owner* header, stepper &slot) {
 	delete_connection();
 	this->handler = header;
 	this->slot = (slot);
+	std::string a;
 }
 
 //-------------------------------------------------------------------------------------//

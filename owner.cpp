@@ -55,17 +55,9 @@ void Owner::delete_connection(const int sig_num) {
 bool Owner::emit_signal(looper signal) {
 	bool flag = false;
 	std::vector<bool> flags;
-	neighbors neighbors = (this->*signal)();
-	
 	if (connections.first != signal)
 		return 0;
-	std::cout << std::endl << "Signal to " << connections.second.handlers.bot->get_name();
-	std::cout << " neighbors:\n";
-	std::cout << '\t' << neighbors.top << std::endl;
-	std::cout << neighbors.left << '\t';
-	std::cout << neighbors.right << std::endl;
-	std::cout << '\t' << neighbors.bot << std::endl;
-			
+	neighbors neighbors = (this->*signal)();
 	flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
 	neighbors = (this->*signal)();
 	flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
@@ -73,19 +65,25 @@ bool Owner::emit_signal(looper signal) {
 	flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
 	neighbors = (this->*signal)();
 	flags.push_back((connections.second.handlers.left->*connections.second.slots.lsnp)(neighbors));
-	neighbors = (this->*signal)();
 	show_matrix();
+	std::cout << std::endl;
 	for (auto const& flag : flags)
 		if (flag) {
-			field[current_unit.row][current_unit.col] = 'F';
+			//field[current_unit.row][current_unit.col] = 'F';
 			return 1;
 		}
+	field[current_unit.row][current_unit.col] = 'F';
 	return 0;
 }
 
 neighbors Owner::loop_survey()
 {
-	return take_neighbors(current_unit);
+	try {
+		return take_neighbors(current_unit);
+	}
+	catch (int) {
+		return { false,false,false,false };
+	}
 }
 
  bool Owner::step(std::string message) {
@@ -119,6 +117,10 @@ neighbors Owner::loop_survey()
 //------------------------------------------------------------------------------------
 
  char& Owner::operator[](position pos) {
+	 if (pos.col < 0 || pos.row < 0)
+		 throw 'a';
+	 if (pos.col >=field.size() || pos.row>=field.size())
+		 throw 'b';
 	 return this->field[pos.row][pos.col];
  }
 
@@ -126,66 +128,22 @@ neighbors Owner::take_neighbors(position elem)const {
 	neighbors symb;
 	Owner temp = (this);
 	size_t const dim = field.size();
-	position left, right, top, bot;
-	left = { elem.row,elem.col - 1 };
-	right = { elem.row,elem.col + 1 };
-	top = { elem.row - 1 ,elem.col };
-	bot = { elem.row + 1,elem.col };
+	position left = { elem.row,elem.col - 1 },
+			right= { elem.row,elem.col + 1 },
+			top= { elem.row - 1 ,elem.col },
+			bot= { elem.row + 1,elem.col };
 	if (elem.row < 0 || elem.col < 0)
-		exit(1);
+		throw 1;
 	if (elem.row >= dim || elem.col >= dim)
-		exit(2);
-	if (elem.row % (dim - 1) == 0 && elem.col % (dim - 1) == 0) {//рассматриваем уловые элементы
-		if (elem.row == elem.col == 0) {// рассматриваем верхний левый угол
-			symb.right =temp[right] == '1' ? true : false;
-			symb.bot = temp[bot] == '1' ? true : false;
-			return symb;
-		}
-		if (elem.row == 0 && elem.col == dim - 1) {// рассматриваем верхний правый угол
-			symb.left = temp[left] == '1' ? true : false;
-			symb.bot = temp[bot] == '1' ? true : false;
-			return symb;
-		}
-		if (elem.row == dim - 1 && elem.col == 0) {// рассматриваем нижний левый угол
-			symb.top = temp[top] == '1' ? true : false;
-			symb.right = temp[right] == '1' ? true : false;
-			return symb;
-		}
-		if (elem.row == elem.col == dim - 1) {// рассматриваем нижний правый угол
-			symb.top = temp[top] == '1' ? true : false;
-			symb.left = temp[left] == '1' ? true : false;
-			return symb;
-		}
-	}
-	if (elem.row == 0) {// рассматриваем первую строку (без углов)
-		symb.left = temp[left] == '1' ? true : false;
-		symb.right = temp[right] == '1' ? true : false;
-		symb.bot = temp[bot] == '1' ? true : false;
-		return symb;
-	}
-	if (elem.row == dim - 1) {// рассматриваем последнюю строку (без углов)
-		symb.left = temp[left] == '1' ? true : false;
-		symb.right = temp[right] == '1' ? true : false;
-		symb.top = temp[top] == '1' ? true : false;
-		return symb;
-	}
-	if (elem.col == 0) {// рассматриваем левую строку (без углов)
-		symb.bot = temp[bot] == '1' ? true : false;
-		symb.right = temp[right] == '1' ? true : false;
-		symb.top = temp[top] == '1' ? true : false;
-		return symb;
-	}
-	if (elem.col == dim - 1) {// рассматриваем правую строку (без углов)
-		symb.bot = temp[bot] == '1' ? true : false;
-		symb.left = temp[left] == '1' ? true : false;
-		symb.top = temp[top] == '1' ? true : false;
-		return symb;
-	}
-	// случаи не в углах и не на сторонах
-	symb.top = temp[top] == '1' ? true : false;
-	symb.bot = temp[bot] == '1' ? true : false;
-	symb.left = temp[left] == '1' ? true : false;
-	symb.right = temp[right] == '1' ? true : false;
+		throw 2;
+	try {symb.top = temp[top] == '1' ? true : false;}
+	catch (char) {}
+	try {symb.bot = temp[bot] == '1' ? true : false;}
+	catch (char) {}
+	try {symb.left = temp[left] == '1' ? true : false;}
+	catch (char) {}
+	try {symb.right = temp[right] == '1' ? true : false;}
+	catch (char) {}
 	return symb;
 }
 

@@ -1,6 +1,5 @@
 #include "snoopes.h"
 #include "owner.h"
-
 #include <iostream>
 #include <fstream>
 
@@ -8,21 +7,6 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
-
-template<typename ONE>
-ONE& selector(ONE& first, ONE& second, const string first_line, const string second_line) {
-	int answer;
-	cout << "\n\nChoose one option:" << endl;
-	cout << "-------------------" << endl;
-	cout << first_line << endl;
-	cout << second_line << endl;
-	cout << ">";
-	cin >> answer;
-	cout << "\n";
-	if (!(answer == 1 || answer == 2))
-		return selector(first, second, first_line, second_line);
-	return (answer == 1) ? first : second;
-}
 
 inline std::string switcher() {
 	int res = 0;
@@ -46,12 +30,34 @@ inline std::string switcher() {
 	return Name;
 }
 
+template<class ONE,class TWO>
+ONE& selector(ONE& first, TWO& second, const string first_line, const string second_line) {
+	int answer;
+	cout << "\n\nChoose one option:" << endl;
+	cout << "-------------------" << endl;
+	cout << first_line << endl;
+	cout << second_line << endl;
+	cout << ">";
+	cin >> answer;
+	cout << "\n";
+	if (!(answer == 1 || answer == 2))
+		return selector(first, second, first_line, second_line);
+	if (answer == 2)
+		dynamic_cast<std::ifstream&>(second).std::ifstream::open(switcher());
+	return (answer == 1) ? first : dynamic_cast<std::ifstream&>(second);
+}
+
+
+
 
 int main() {
-	system("README.txt");
-	std::ifstream file(switcher());
-	std::istream& stream = selector(cin, dynamic_cast<std::istream&>(file), "Statdart console input (cin)  1", "Input from file           2");
-	int a = 5;
+	//system("README.txt");
+	//std::ifstream file(switcher());
+	std::ifstream file;
+	std::string line;
+	//file>> line;
+	std::istream& stream = selector(cin, file, "Statdart console input (cin)  1", "Input from file           2");
+	int a = 10;
 	Owner field(a);
 	/*TopSnoopy Top;
 	RightSnoopy Right;

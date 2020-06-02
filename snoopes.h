@@ -15,7 +15,6 @@ public:
 	bool emit_signal(const neighbors) ;				   // испустить сигнал, опопвестить обработчики
 	std::string IsUnitHere(const neighbors);
 	std::string get_name()const;
-	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
 	friend void process(Owner*);
 
 };
@@ -29,7 +28,6 @@ public:
 	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
 	std::string IsUnitHere(const neighbors);
 	std::string get_name()const;
-	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
 	friend void process(Owner*);
 
 };
@@ -43,7 +41,6 @@ public:
 	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
 	std::string IsUnitHere(const neighbors);
 	std::string get_name()const;
-	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
 	friend void process(Owner*);
 
 };
@@ -57,7 +54,6 @@ public:
 	bool emit_signal(const neighbors);				   // испустить сигнал, опопвестить обработчики
 	std::string IsUnitHere(const neighbors);
 	std::string get_name()const;
-	//friend void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left);
 	friend void process(Owner*);
 
 };

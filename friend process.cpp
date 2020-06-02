@@ -2,7 +2,6 @@
 #include "snoopes.h"
 #include "sructures.h"
 
-//void process(Owner* matrix, TopSnoopy* Top, RightSnoopy* Right, BotSnoopy* Bot, LeftSnoopy* Left) {
 void process(Owner* matrix){
 	TopSnoopy Top;
 	RightSnoopy Right;
@@ -28,5 +27,5 @@ void process(Owner* matrix){
 	for (;;)
 		if (!matrix->emit_signal(loop))
 			break;
-
+	matrix->show_matrix();
 }
