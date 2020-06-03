@@ -2,6 +2,7 @@
 #include <vector>
 #include "owner.h"
 #include "snoopes.h"
+#include <algorithm>
 
 Owner::Owner(int dim) :current_unit({ -1,-1 }) {
 	field.resize(dim);
@@ -10,13 +11,40 @@ Owner::Owner(int dim) :current_unit({ -1,-1 }) {
 Owner::Owner(const Owner* old) : current_unit(old->current_unit), field(old->field) {}
 
 
-
 void Owner::find_first_unit() {
-	for (auto &line:field)
-		if (line[0] == '1') {
-			current_unit = { &line - &field.front(),0};
-			return;
+	int first, last;
+	std::vector<char> null_col;
+	for (auto& line : field)
+		null_col.push_back(line[0]);
+	if (find(null_col.begin(),null_col.end(),'1')==null_col.end())
+		return;
+	for (auto& elem : null_col) 
+		if (elem == '1') {
+			first = &elem - &null_col.front();
+			break;
 		}
+	reverse(null_col.begin(),null_col.end());
+	for (auto& elem : null_col)
+		if (elem == '1') {
+			last = &null_col.back() - &elem;
+			break;
+		}
+	if (last == first) {
+		current_unit = {last,0 };
+		return;
+	}
+	neighbors f= take_neighbors({ first, 0 });
+	neighbors l = take_neighbors({ last, 0 });
+	if(!f.right)
+		current_unit = { first,0 };
+	if(!l.right)
+		current_unit = { last,0 };
+}
+
+position Owner::get_curr_unit()
+{
+	this->find_first_unit();
+	return current_unit;
 }
 
 void Owner::create_field(std::istream& stream) {
@@ -28,10 +56,11 @@ void Owner::create_field(std::istream& stream) {
 }
 
 void Owner::show_matrix() const {
-	for (auto vec : field) {
+	for (auto &vec : field) {
+		if (&vec != &field.front())
+			std::cout << std::endl;
 		for (auto el : vec)
 			std::cout << el;
-		std::cout << std::endl;
 	}
 }
 
@@ -52,50 +81,55 @@ void Owner::delete_connection(const int sig_num) {
 	connections = { nullptr ,{0,0}};
 };
 
+
 bool Owner::emit_signal(looper signal) {
 	bool flag = false;
 	std::vector<bool> flags;
-	neighbors neighbors = (this->*signal)();
-	
 	if (connections.first != signal)
 		return 0;
-	std::cout << std::endl << "Signal to " << connections.second.handlers.bot->get_name();
-	std::cout << " neighbors:\n";
-	std::cout << '\t' << neighbors.top << std::endl;
-	std::cout << neighbors.left << '\t';
-	std::cout << neighbors.right << std::endl;
-	std::cout << '\t' << neighbors.bot << std::endl;
-			
-	flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
-	neighbors = (this->*signal)();
-	flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
-	neighbors = (this->*signal)();
-	flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
-	neighbors = (this->*signal)();
-	flags.push_back((connections.second.handlers.left->*connections.second.slots.lsnp)(neighbors));
-	neighbors = (this->*signal)();
-	show_matrix();
+	neighbors neighbors = (this->*signal)();
+	if (neighbors.top ) {
+		flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	else if(neighbors.right){
+		flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	else {
+		flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
 	for (auto const& flag : flags)
-		if (flag) {
-			field[current_unit.row][current_unit.col] = 'F';
+		if (flag)
 			return 1;
-		}
+	try {
+		this%current_unit='F';
+	}
+	catch(...){};
 	return 0;
 }
 
 neighbors Owner::loop_survey()
 {
-	return take_neighbors(current_unit);
+	try {
+		return take_neighbors(current_unit);
+	}
+	catch (int) {
+		return { false,false,false,false };
+	}
 }
 
  bool Owner::step(std::string message) {
 	if (current_unit.col < 0 || current_unit.row < 0) {
-		std::cout << "Out of array";
 		return false;
 	}
 	if (message[message.length() - 1] == '2')
 		 return 0;
-	field[current_unit.row][current_unit.col] = 'F';
+	try {
+		this% current_unit = 'F';
+	}
+	catch (...) {};
 	switch (message[0])
 	{
 	case't':
@@ -119,6 +153,10 @@ neighbors Owner::loop_survey()
 //------------------------------------------------------------------------------------
 
  char& Owner::operator[](position pos) {
+	 if (pos.col < 0 || pos.row < 0)
+		 throw 'a';
+	 if (pos.col >=field.size() || pos.row>=field.size())
+		 throw 'b';
 	 return this->field[pos.row][pos.col];
  }
 
@@ -126,66 +164,22 @@ neighbors Owner::take_neighbors(position elem)const {
 	neighbors symb;
 	Owner temp = (this);
 	size_t const dim = field.size();
-	position left, right, top, bot;
-	left = { elem.row,elem.col - 1 };
-	right = { elem.row,elem.col + 1 };
-	top = { elem.row - 1 ,elem.col };
-	bot = { elem.row + 1,elem.col };
+	position left = { elem.row,elem.col - 1 },
+			right= { elem.row,elem.col + 1 },
+			top= { elem.row - 1 ,elem.col },
+			bot= { elem.row + 1,elem.col };
 	if (elem.row < 0 || elem.col < 0)
-		exit(1);
+		throw 1;
 	if (elem.row >= dim || elem.col >= dim)
-		exit(2);
-	if (elem.row % (dim - 1) == 0 && elem.col % (dim - 1) == 0) {//рассматриваем уловые элементы
-		if (elem.row == elem.col == 0) {// рассматриваем верхний левый угол
-			symb.right =temp[right] == '1' ? true : false;
-			symb.bot = temp[bot] == '1' ? true : false;
-			return symb;
-		}
-		if (elem.row == 0 && elem.col == dim - 1) {// рассматриваем верхний правый угол
-			symb.left = temp[left] == '1' ? true : false;
-			symb.bot = temp[bot] == '1' ? true : false;
-			return symb;
-		}
-		if (elem.row == dim - 1 && elem.col == 0) {// рассматриваем нижний левый угол
-			symb.top = temp[top] == '1' ? true : false;
-			symb.right = temp[right] == '1' ? true : false;
-			return symb;
-		}
-		if (elem.row == elem.col == dim - 1) {// рассматриваем нижний правый угол
-			symb.top = temp[top] == '1' ? true : false;
-			symb.left = temp[left] == '1' ? true : false;
-			return symb;
-		}
-	}
-	if (elem.row == 0) {// рассматриваем первую строку (без углов)
-		symb.left = temp[left] == '1' ? true : false;
-		symb.right = temp[right] == '1' ? true : false;
-		symb.bot = temp[bot] == '1' ? true : false;
-		return symb;
-	}
-	if (elem.row == dim - 1) {// рассматриваем последнюю строку (без углов)
-		symb.left = temp[left] == '1' ? true : false;
-		symb.right = temp[right] == '1' ? true : false;
-		symb.top = temp[top] == '1' ? true : false;
-		return symb;
-	}
-	if (elem.col == 0) {// рассматриваем левую строку (без углов)
-		symb.bot = temp[bot] == '1' ? true : false;
-		symb.right = temp[right] == '1' ? true : false;
-		symb.top = temp[top] == '1' ? true : false;
-		return symb;
-	}
-	if (elem.col == dim - 1) {// рассматриваем правую строку (без углов)
-		symb.bot = temp[bot] == '1' ? true : false;
-		symb.left = temp[left] == '1' ? true : false;
-		symb.top = temp[top] == '1' ? true : false;
-		return symb;
-	}
-	// случаи не в углах и не на сторонах
-	symb.top = temp[top] == '1' ? true : false;
-	symb.bot = temp[bot] == '1' ? true : false;
-	symb.left = temp[left] == '1' ? true : false;
-	symb.right = temp[right] == '1' ? true : false;
+		throw 2;
+	try {symb.top = temp[top] == '1' ? true : false;}
+	catch (char) {}
+	try {symb.bot = temp[bot] == '1' ? true : false;}
+	catch (char) {}
+	try {symb.left = temp[left] == '1' ? true : false;}
+	catch (char) {}
+	try {symb.right = temp[right] == '1' ? true : false;}
+	catch (char) {}
 	return symb;
 }
 

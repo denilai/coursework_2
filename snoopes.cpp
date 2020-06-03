@@ -42,25 +42,21 @@ void RightSnoopy::set_connection(Owner* header, stepper &slot) {
 }
 
 //------------------------------------class TopSnoopy---------------------------------//
+std::string TopSnoopy::IsUnitHere(const neighbors symb) { return symb.top ? "tsignal_1" : "tsignal_2"; }
 
-std::string TopSnoopy::IsUnitHere(const neighbors symb) { 
-	return symb.top ? "tsignal_1" : "tsignal_2"; }
+std::string TopSnoopy::get_name()const { return "TopSnoopy"; }
 
-std::string TopSnoopy::get_name()const { 
-	return "TopSnoopy"; }
-
-bool TopSnoopy::emit_signal(const neighbors symb) { 
-	return (handler->*(*slot))(IsUnitHere(symb)); }
+bool TopSnoopy::emit_signal(const neighbors symb) { return (handler->*slot)(IsUnitHere(symb)); }
 
 void TopSnoopy::delete_connection() {
 	handler = nullptr;
 	slot = nullptr;
 }
 
-void TopSnoopy::set_connection(Owner* header, stepper &slot) {
+void TopSnoopy::set_connection(Owner* header, stepper& slot) {
 	delete_connection();
 	this->handler = header;
-	this->slot = &(slot);
+	this->slot = (slot);
 }
 
 //------------------------------------class BotSnoopy---------------------------------//
@@ -80,6 +76,7 @@ void BotSnoopy::set_connection(Owner* header, stepper &slot) {
 	delete_connection();
 	this->handler = header;
 	this->slot = (slot);
+	std::string a;
 }
 
 //-------------------------------------------------------------------------------------//
