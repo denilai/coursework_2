@@ -14,7 +14,7 @@ typedef struct {// координаты элемента по сути просто std::pair
 	int col;
 }position;
 
-typedef struct {// соседи какого-либо элемента массива. 
+typedef struct s{// соседи какого-либо элемента массива. 
 	bool top = false;
 	bool right = false;
 	bool bot = false;;

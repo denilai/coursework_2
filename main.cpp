@@ -60,8 +60,6 @@ int main() {
 	//system("README.txt");
 	//std::ifstream file(switcher());
 	std::ifstream file;
-	std::string line;
-	//file>> line;
 	std::istream& stream = selector(cin, file, "Statdart console input (cin)  1", "Input from file           2");
 	int a = 10;
 	Owner field(a);

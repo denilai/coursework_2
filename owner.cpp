@@ -64,51 +64,7 @@ void Owner::show_matrix() const {
 	}
 }
 
-//----------------------- сигналы-обработчики--------------------------------------------
-void Owner::set_connection(looper signal, pack handlers, snoopers slots, const int sig_num) {
-	if (connections.second.sig_num == sig_num)
-		return;
-	to_snp_info_t  din_struct;
-	din_struct.handlers = handlers;
-	din_struct.slots = slots;
-	din_struct.sig_num = sig_num;
-	connections=(std::make_pair(signal, din_struct));
-	return;
-}
 
-void Owner::delete_connection(const int sig_num) {
-	connections.first = nullptr;
-	connections = { nullptr ,{0,0}};
-};
-
-
-bool Owner::emit_signal(looper signal) {
-	bool flag = false;
-	std::vector<bool> flags;
-	if (connections.first != signal)
-		return 0;
-	neighbors neighbors = (this->*signal)();
-	if (neighbors.top ) {
-		flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
-		neighbors = (this->*signal)();
-	}
-	else if(neighbors.right){
-		flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
-		neighbors = (this->*signal)();
-	}
-	else {
-		flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
-		neighbors = (this->*signal)();
-	}
-	for (auto const& flag : flags)
-		if (flag)
-			return 1;
-	try {
-		this%current_unit='F';
-	}
-	catch(...){};
-	return 0;
-}
 
 neighbors Owner::loop_survey()
 {
@@ -150,15 +106,7 @@ neighbors Owner::loop_survey()
 	return 1;
 }
 
-//------------------------------------------------------------------------------------
 
- char& Owner::operator[](position pos) {
-	 if (pos.col < 0 || pos.row < 0)
-		 throw 'a';
-	 if (pos.col >=field.size() || pos.row>=field.size())
-		 throw 'b';
-	 return this->field[pos.row][pos.col];
- }
 
 neighbors Owner::take_neighbors(position elem)const {
 	neighbors symb;
@@ -184,4 +132,58 @@ neighbors Owner::take_neighbors(position elem)const {
 }
 
 
+//----------------------- сигналы-обработчики--------------------------------------------
+void Owner::set_connection(looper signal, pack handlers, snoopers slots, const int sig_num) {
+	if (connections.second.sig_num == sig_num)
+		return;
+	to_snp_info_t  din_struct;
+	din_struct.handlers = handlers;
+	din_struct.slots = slots;
+	din_struct.sig_num = sig_num;
+	connections = (std::make_pair(signal, din_struct));
+	return;
+}
 
+void Owner::delete_connection(const int sig_num) {
+	connections.first = nullptr;
+	connections = { nullptr ,{0,0} };
+};
+
+
+bool Owner::emit_signal(looper signal) {
+	bool flag = false;
+	std::vector<bool> flags;
+	if (connections.first != signal)
+		return 0;
+	neighbors neighbors = (this->*signal)();
+	if (neighbors.top) {
+		flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	else if (neighbors.right) {
+		flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	else {
+		flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	for (auto const& flag : flags)
+		if (flag)
+			return 1;
+	try {
+		this% current_unit = 'F';
+	}
+	catch (...) {};
+	return 0;
+}
+
+//----------------------------перегрузка оператора------------------------------------
+
+char& Owner::operator[](position pos) {
+	if (pos.col < 0 || pos.row < 0)
+		throw 'a';
+	if (pos.col >= field.size() || pos.row >= field.size())
+		throw 'b';
+	return this->field[pos.row][pos.col];
+}
