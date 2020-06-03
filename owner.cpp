@@ -2,6 +2,7 @@
 #include <vector>
 #include "owner.h"
 #include "snoopes.h"
+#include <algorithm>
 
 Owner::Owner(int dim) :current_unit({ -1,-1 }) {
 	field.resize(dim);
@@ -11,11 +12,33 @@ Owner::Owner(const Owner* old) : current_unit(old->current_unit), field(old->fie
 
 
 void Owner::find_first_unit() {
-	for (auto &line:field)
-		if (line[0] == '1') {
-			current_unit = { &line - &field.front(),0};
-			return;
+	int first, last;
+	std::vector<char> null_col;
+	for (auto& line : field)
+		null_col.push_back(line[0]);
+	if (find(null_col.begin(),null_col.end(),'1')==null_col.end())
+		return;
+	for (auto& elem : null_col) 
+		if (elem == '1') {
+			first = &elem - &null_col.front();
+			break;
 		}
+	reverse(null_col.begin(),null_col.end());
+	for (auto& elem : null_col)
+		if (elem == '1') {
+			last = &null_col.back() - &elem;
+			break;
+		}
+	if (last == first) {
+		current_unit = {last,0 };
+		return;
+	}
+	neighbors f= take_neighbors({ first, 0 });
+	neighbors l = take_neighbors({ last, 0 });
+	if(!f.right)
+		current_unit = { first,0 };
+	if(!l.right)
+		current_unit = { last,0 };
 }
 
 position Owner::get_curr_unit()
@@ -65,22 +88,21 @@ bool Owner::emit_signal(looper signal) {
 	if (connections.first != signal)
 		return 0;
 	neighbors neighbors = (this->*signal)();
-	if((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors))
-
-	flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
-	neighbors = (this->*signal)();
-	flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
-	neighbors = (this->*signal)();
-	flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
-	neighbors = (this->*signal)();
-	//flags.push_back((connections.second.handlers.left->*connections.second.slots.lsnp)(neighbors));
-	//show_matrix();
-	std::cout << std::endl;
+	if (neighbors.top ) {
+		flags.push_back((connections.second.handlers.top->*connections.second.slots.tsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	else if(neighbors.right){
+		flags.push_back((connections.second.handlers.right->*connections.second.slots.rsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
+	else {
+		flags.push_back((connections.second.handlers.bot->*connections.second.slots.bsnp)(neighbors));
+		neighbors = (this->*signal)();
+	}
 	for (auto const& flag : flags)
-		if (flag) {
-			//field[current_unit.row][current_unit.col] = 'F';
+		if (flag)
 			return 1;
-		}
 	try {
 		this%current_unit='F';
 	}
